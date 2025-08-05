@@ -1,109 +1,220 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCurrentUser } from './store/thunks/authThunks';
-import api from './services/api';
+import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import store from './store/store';
 
-// Layout
+// Components
 import Layout from './components/layout/Layout';
-
-// Auth Components
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
-import PrivateRoute from './components/auth/PrivateRoute';
 import FirstAdminCreation from './components/auth/FirstAdminCreation';
+import Dashboard from './components/dashboard/Dashboard';
+import TaskList from './components/tasks/TaskList';
+import TaskForm from './components/tasks/TaskForm';
+import TaskDetails from './components/tasks/TaskDetails';
+import UserList from './components/users/UserList';
+import UserForm from './components/users/UserForm';
+import UserProfile from './components/users/UserProfile';
+import UserProfileView from './components/users/UserProfileView';
+import Reports from './components/reports/Reports';
+import AdminReports from './components/reports/AdminReports';
+import UserReports from './components/reports/UserReports';
+import Profile from './components/profile/Profile';
+import Unauthorized from './components/auth/Unauthorized';
+
+// Protected Route Components
+import PrivateRoute from './components/auth/PrivateRoute';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Admin Components
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminCreation from './components/admin/AdminCreation';
-import UserList from './components/users/UserList';
-import UserForm from './components/users/UserForm';
-import UserProfileView from './components/users/UserProfileView';
-
-// User Components
-import Dashboard from './components/dashboard/Dashboard';
-import TaskList from './components/tasks/TaskList';
-import TaskForm from './components/tasks/TaskForm';
-import Reports from './components/reports/Reports';
-import Profile from './components/profile/Profile';
-import UserProfile from './components/profile/UserProfile';
-
-const router = {
-  future: {
-    v7_startTransition: true,
-    v7_relativeSplatPath: true
-  }
-};
 
 function App() {
-  const dispatch = useDispatch();
-  const { currentUser, isLoading: authLoading } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    // Initialize API token from localStorage
-    const token = localStorage.getItem('token');
-    if (token) {
-      api.setAuthToken(token);
-      dispatch(fetchCurrentUser());
-    }
-  }, [dispatch]); // Remove currentUser dependency to prevent infinite loop
-
-  // Show loading while auth state is being determined
-  if (authLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
-      </div>
-    );
-  }
-
   return (
-    <Router {...router}>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/create-first-admin" element={<FirstAdminCreation />} />
+    <Provider store={store}>
+      <Router>
+        <div className="App">
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/create-first-admin" element={<FirstAdminCreation />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* Protected Routes */}
-        <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
-          {/* Admin Routes */}
-          <Route path="/admin">
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<PrivateRoute roles={['admin']}><AdminDashboard /></PrivateRoute>} />
-            <Route path="users" element={<PrivateRoute roles={['admin']}><UserList /></PrivateRoute>} />
-            <Route path="users/new" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
-            <Route path="users/:id" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
-            <Route path="users/:userId/edit" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
-            <Route path="users/:userId/profile" element={<PrivateRoute roles={['admin']}><UserProfileView /></PrivateRoute>} />
-            <Route path="tasks" element={<PrivateRoute roles={['admin']}><TaskList /></PrivateRoute>} />
-            <Route path="tasks/new" element={<PrivateRoute roles={['admin']}><TaskForm /></PrivateRoute>} />
-            <Route path="tasks/:id/edit" element={<PrivateRoute roles={['admin']}><TaskForm /></PrivateRoute>} />
-            <Route path="create-admin" element={<PrivateRoute roles={['admin']}><AdminCreation /></PrivateRoute>} />
-            <Route path="reports" element={<PrivateRoute roles={['admin']}><Reports /></PrivateRoute>} />
-          </Route>
+            {/* Protected User Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <TaskList />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/tasks/new"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <TaskForm />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/tasks/:id"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <TaskForm />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/tasks/:id/details"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <TaskDetails />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <Reports />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
 
-          {/* User Routes */}
-          <Route path="/">
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="tasks" element={<TaskList />} />
-            <Route path="tasks/new" element={<TaskForm />} />
-            <Route path="tasks/:id/edit" element={<TaskForm />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="profile" element={<UserProfile />} />
-          </Route>
-        </Route>
+            {/* Admin Routes */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <AdminDashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <UserList />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users/new"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <UserForm />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users/:id"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <UserForm />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users/:id/profile"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <UserProfileView />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/tasks"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <TaskList />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/reports"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <AdminReports />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/create-admin"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <AdminCreation />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
 
-        {/* Fallback redirect */}
-        <Route path="*" element={
-          currentUser?.role === 'admin' ? 
-            <Navigate to="/admin/dashboard" replace /> : 
-            <Navigate to="/dashboard" replace />
-        } />
-      </Routes>
-    </Router>
+            {/* Default redirect */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </div>
+      </Router>
+    </Provider>
   );
 }
 
