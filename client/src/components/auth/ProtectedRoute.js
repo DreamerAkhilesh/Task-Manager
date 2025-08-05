@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { getCurrentUser } from '../../store/thunks/authThunks';
+import { fetchCurrentUser } from '../../store/thunks/authThunks';
 import PropTypes from 'prop-types';
 
 const ProtectedRoute = ({ roles = [] }) => {
@@ -13,7 +13,7 @@ const ProtectedRoute = ({ roles = [] }) => {
     // Only fetch user if we have a token but no user data
     const token = localStorage.getItem('token');
     if (token && !currentUser && !isLoading) {
-      dispatch(getCurrentUser());
+      dispatch(fetchCurrentUser());
     }
   }, [dispatch, currentUser, isLoading]);
 

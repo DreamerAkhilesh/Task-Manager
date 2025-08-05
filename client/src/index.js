@@ -5,7 +5,7 @@ import store from './store/store';
 import App from './App';
 import './index.css';
 
-// Force new deployment - ESLint fixes applied - v2
+// Force new deployment - All ESLint errors fixed and import issues resolved
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
