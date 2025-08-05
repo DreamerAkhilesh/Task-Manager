@@ -128,7 +128,6 @@ const UserList = () => {
       const direction = sortDirection === 'asc' ? 1 : -1;
       return direction * (a[sortField]?.localeCompare(b[sortField]) || 0);
     });
-    });
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -162,7 +161,7 @@ const UserList = () => {
     };
   };
 
-  // const handleDelete = (userId) => {
+  const handleDelete = (userId) => {
     setSelectedUser(userId);
     setShowDeleteModal(true);
   };
