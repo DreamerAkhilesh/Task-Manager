@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
-import { getCurrentUser } from '../../store/slices/authSlice';
+import { getCurrentUser } from '../../store/thunks/authThunks';
 import PropTypes from 'prop-types';
 
 const ProtectedRoute = ({ roles = [] }) => {
