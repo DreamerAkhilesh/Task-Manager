@@ -33,6 +33,38 @@ A full-stack web application for managing tasks with user authentication, role-b
 
 ## Setup Instructions
 
+### 🚀 Quick Start (With Deployed Backend)
+
+Since the backend is already deployed, you can start the frontend immediately:
+
+1. **Clone the repository:**
+```bash
+git clone <repository-url>
+cd task-manager
+```
+
+2. **Install frontend dependencies:**
+```bash
+cd client
+npm install
+```
+
+3. **Start the frontend:**
+```bash
+npm start
+```
+
+4. **Create First Admin:**
+   - Visit `http://localhost:3000/create-first-admin`
+   - Create your first admin account
+   - Login and start using the application
+
+The frontend will automatically connect to the deployed backend at `https://task-manager-api-r4tk.onrender.com`
+
+### 🔧 Full Local Setup (Optional)
+
+If you want to run both frontend and backend locally:
+
 1. **Clone the repository:**
 ```bash
 git clone <repository-url>
@@ -102,6 +134,17 @@ This application is configured for easy deployment to production using:
 - **Backend**: [Render](https://render.com) (free tier available)
 - **Frontend**: [Vercel](https://vercel.com) (free tier available)
 - **Database**: [MongoDB Atlas](https://mongodb.com/atlas) (free tier available)
+
+### ✅ Backend Integration Status
+
+The backend is **successfully deployed** and integrated:
+
+- **Backend URL**: `https://task-manager-api-r4tk.onrender.com`
+- **Health Check**: ✅ Working
+- **API Endpoints**: ✅ All endpoints accessible
+- **CORS Configuration**: ✅ Properly configured for frontend integration
+
+For detailed integration information, see: [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md)
 
 ### Quick Deployment
 
