@@ -42,12 +42,12 @@ const TaskList = () => {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [assignedToFilter, setAssignedToFilter] = useState("all");
   const [showStats, setShowStats] = useState(true);
-  const [selectedTask, setSelectedTask] = useState(null);
+  // const [selectedTask, setSelectedTask] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [selectedTasks, setSelectedTasks] = useState([]);
-  const [showBulkActions, setShowBulkActions] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+  // const [showBulkActions, setShowBulkActions] = useState(false);
+  // const [showFilters, setShowFilters] = useState(false);
   const [sortField, setSortField] = useState("dueDate");
   const [sortDirection, setSortDirection] = useState("asc");
 
@@ -67,7 +67,7 @@ const TaskList = () => {
     if (currentUser && currentUser.role === "admin") {
       dispatch(getUsers());
     }
-  }, [dispatch, currentUser?._id, currentUser?.role]);
+  }, [dispatch, currentUser]);
 
   const handleSort = (field) => {
     if (sortField === field) {

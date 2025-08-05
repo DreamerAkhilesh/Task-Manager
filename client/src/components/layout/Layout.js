@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
-import { logoutUser, fetchCurrentUser } from '../../store/thunks/authThunks';
-import Button from '../common/Button';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { logoutUser } from '../../store/thunks/authThunks';
 
 const Layout = () => {
   const dispatch = useDispatch();

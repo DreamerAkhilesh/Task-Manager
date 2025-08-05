@@ -41,9 +41,9 @@ const UserList = () => {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
+  // const [userToDelete, setUserToDelete] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [showBulkActions, setShowBulkActions] = useState(false);
+  // const [showBulkActions, setShowBulkActions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -161,7 +161,7 @@ const UserList = () => {
     };
   };
 
-  const handleDelete = (userId) => {
+  // const handleDelete = (userId) => {
     setSelectedUser(userId);
     setShowDeleteModal(true);
   };
