@@ -5,7 +5,7 @@ import store from './store/store';
 import App from './App';
 import './index.css';
 
-// Force new deployment - ESLint fixes applied
+// Force new deployment - ESLint fixes applied - v2
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
