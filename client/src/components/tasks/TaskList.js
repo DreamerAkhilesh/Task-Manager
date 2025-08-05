@@ -46,7 +46,7 @@ const TaskList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [selectedTasks, setSelectedTasks] = useState([]);
-  // const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showBulkActions, setShowBulkActions] = useState(false);
   // const [showFilters, setShowFilters] = useState(false);
   const [sortField, setSortField] = useState("dueDate");
   const [sortDirection, setSortDirection] = useState("asc");

@@ -43,7 +43,7 @@ const UserList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   // const [userToDelete, setUserToDelete] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
-  // const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showBulkActions, setShowBulkActions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -127,6 +127,7 @@ const UserList = () => {
     .sort((a, b) => {
       const direction = sortDirection === 'asc' ? 1 : -1;
       return direction * (a[sortField]?.localeCompare(b[sortField]) || 0);
+    });
     });
 
   const getRoleColor = (role) => {
