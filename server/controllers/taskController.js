@@ -2,6 +2,7 @@ const Task = require('../models/Task');
 const User = require('../models/User');
 const { deleteFile } = require('../utils/fileUpload');
 const path = require('path');
+const fs = require('fs').promises;
 
 // @desc    Get all tasks
 // @route   GET /api/tasks
@@ -323,8 +324,8 @@ exports.uploadDocument = async (req, res) => {
       });
     }
 
-    // Add document to task
-    task.addDocument({
+    // Add attachment to task
+    task.addAttachment({
       filename: req.file.filename,
       originalName: req.file.originalname,
       path: req.file.path,
@@ -379,7 +380,7 @@ exports.deleteDocument = async (req, res) => {
       });
     }
 
-    const document = task.documents.id(req.params.docId);
+    const document = task.attachments.id(req.params.docId);
     if (!document) {
       return res.status(404).json({
         success: false,

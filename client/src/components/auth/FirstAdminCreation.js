@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { createFirstAdmin } from '../../store/slices/authSlice';
+import { createFirstAdmin } from '../../store/thunks/authThunks';
 import Button from '../common/Button';
 
 const FirstAdminCreation = () => {

@@ -10,17 +10,22 @@ const ProtectedRoute = ({ roles = [] }) => {
   const { currentUser, isAuthenticated, isLoading } = useSelector((state) => state.auth);
 
   useEffect(() => {
+    // Only fetch user if we have a token but no user data
     const token = localStorage.getItem('token');
-    if (token && !currentUser) {
+    if (token && !currentUser && !isLoading) {
       dispatch(getCurrentUser());
     }
-  }, [currentUser, dispatch]);
+  }, [dispatch, currentUser, isLoading]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+      </div>
+    );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !currentUser) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

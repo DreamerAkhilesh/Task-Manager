@@ -1,375 +1,217 @@
-# FlowPilot - Modern Task Management System
+# Task Management System
 
-![FlowPilot Logo](path/to/logo.png)
-
-FlowPilot is a comprehensive task management solution built with the MERN stack (MongoDB, Express.js, React.js, Node.js). It provides a modern, intuitive interface for managing tasks, users, and team collaboration.
-
-## Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [User Guide](#user-guide)
-- [API Documentation](#api-documentation)
-- [Security](#security)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [Support](#support)
-- [License](#license)
+A full-stack web application for managing tasks with user authentication, role-based access control, and file attachments.
 
 ## Features
 
-### Core Features
-- 🔐 **Authentication & Authorization**
-  - JWT-based authentication
-  - Role-based access control (Admin/User)
-  - Secure password management
-  - Session handling
-
-- 👥 **User Management**
-  - User registration and profile management
-  - Role assignment and permissions
-  - Department organization
-  - User activity tracking
-
-- 📋 **Task Management**
-  - Create, assign, and track tasks
-  - Set priorities and deadlines
-  - File attachments
-  - Task comments and updates
-  - Status tracking (Pending, In Progress, Completed)
-
-- 📊 **Dashboard & Analytics**
-  - Real-time task overview
-  - Performance metrics
-  - Team statistics
-  - Custom reports
-
-### Advanced Features
-- 📱 **Responsive Design**
-  - Mobile-first approach
-  - Cross-browser compatibility
-  - Touch-friendly interface
-
-- 🔍 **Search & Filter**
-  - Advanced search capabilities
-  - Custom filters
-  - Saved search preferences
-
-- 📈 **Reporting**
-  - Custom report generation
-  - Data visualization
-  - Export capabilities
-  - Scheduled reports
-
-- 🔔 **Notifications**
-  - Real-time updates
-  - Email notifications
-  - Custom notification preferences
+- 🔒 JWT-based authentication with role-based access control
+- 👥 User management (Admin and User roles)
+- 📝 Task management with CRUD operations
+- 📎 PDF document attachments (up to 3 per task)
+- 🔍 Advanced filtering and sorting
+- 📱 Responsive design with modern UI
 
 ## Tech Stack
 
-### Frontend
-- **React.js** - UI framework
-- **Redux Toolkit** - State management
-- **React Router** - Navigation
-- **Tailwind CSS** - Styling
-- **Heroicons** - Icons
-- **React Toastify** - Notifications
-
 ### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - Database
-- **Mongoose** - ODM
-- **JWT** - Authentication
-- **Bcrypt** - Password hashing
+- Node.js + Express
+- MongoDB
+- JWT Authentication
+- Jest for testing
 
-## Getting Started
+### Frontend
+- React
+- Tailwind CSS
+- Redux Toolkit
+- React Router
 
-### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB (v4.4 or higher)
-- npm (v6 or higher) or yarn
-- Git
+## Prerequisites
 
-### System Requirements
-- **Minimum**
-  - 2GB RAM
-  - 1 CPU core
-  - 10GB storage
+- Node.js (v16 or higher)
+- Docker and Docker Compose (optional)
+- MongoDB (if running locally)
 
-- **Recommended**
-  - 4GB RAM
-  - 2 CPU cores
-  - 20GB storage
+## Setup Instructions
 
-## Installation
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/flowpilot.git
-   cd flowpilot
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   # Install server dependencies
-   cd server
-   npm install
-
-   # Install client dependencies
-   cd ../client
-   npm install
-   ```
-
-3. **Environment Setup**
-   Create `.env` files in both server and client directories:
-
-   Server (.env):
-   ```env
-   PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/flowpilot
-   JWT_SECRET=your_secure_jwt_secret
-   NODE_ENV=development
-   ```
-
-   Client (.env):
-   ```env
-   REACT_APP_API_URL=http://localhost:5000/api
-   ```
-
-## Configuration
-
-### Database Configuration
-1. **MongoDB Setup**
-   ```bash
-   # Start MongoDB service
-   mongod --dbpath /path/to/data/db
-   ```
-
-2. **Database Initialization**
-   ```bash
-   # Create admin user
-   npm run init-db
-   ```
-
-### Security Configuration
-1. **JWT Configuration**
-   - Set strong JWT secret
-   - Configure token expiration
-   - Enable refresh tokens
-
-2. **Password Policy**
-   - Minimum length: 8 characters
-   - Require special characters
-   - Enable password reset
-
-## Running the Application
-
-### Development Mode
-1. **Start the Server**
-   ```bash
-   cd server
-   npm run dev
-   ```
-
-2. **Start the Client**
-   ```bash
-   cd client
-   npm start
-   ```
-
-3. **Access the Application**
-   - Open `http://localhost:3000` in your browser
-
-### Production Mode
-1. **Build the Client**
-   ```bash
-   cd client
-   npm run build
-   ```
-
-2. **Start Production Server**
-   ```bash
-   cd ../server
-   npm start
-   ```
-
-### Using the Start Script
+1. **Clone the repository:**
 ```bash
-node start.js
+git clone <repository-url>
+cd task-manager
 ```
 
-## User Guide
+2. **Install dependencies:**
+```bash
+# Install backend dependencies
+cd server
+npm install
 
-### For Administrators
-1. **User Management**
-   - Create/Edit/Delete users
-   - Assign roles and permissions
-   - Monitor user activity
-   - Manage departments
+# Install frontend dependencies
+cd ../client
+npm install
+```
 
-2. **System Configuration**
-   - Configure system settings
-   - Manage notifications
-   - Set up integrations
-   - Monitor system health
+3. **Environment Setup:**
+   
+   **Backend:**
+   ```bash
+   cd server
+   cp env.example .env
+   # Edit .env with your configuration
+   ```
+   
+   **Frontend:**
+   ```bash
+   cd client
+   cp env.example .env
+   # Edit .env with your configuration
+   ```
 
-3. **Reports and Analytics**
-   - Generate system reports
-   - View team performance
-   - Track task metrics
-   - Export data
+4. **Start MongoDB:**
+   ```bash
+   # Using Docker
+   docker run -d -p 27017:27017 --name mongodb mongo:latest
+   
+   # Or install MongoDB locally
+   ```
 
-### For Regular Users
-1. **Task Management**
-   - Create and assign tasks
-   - Update task status
-   - Add comments and files
-   - Track progress
+5. **Run with Docker (Recommended):**
+```bash
+docker-compose up
+```
 
-2. **Profile Management**
-   - Update personal information
-   - Change password
-   - Set preferences
-   - View activity history
+6. **Run locally:**
+```bash
+# Start backend (from server directory)
+cd server
+npm run dev
 
-3. **Dashboard Usage**
-   - View assigned tasks
-   - Check performance metrics
-   - Monitor deadlines
-   - Access quick actions
+# Start frontend (from client directory)
+cd client
+npm start
+```
+
+7. **Create First Admin:**
+   - Visit `http://localhost:3000/create-first-admin`
+   - Create your first admin account
+   - Login and start using the application
+
+## 🚀 Deployment
+
+This application is configured for easy deployment to production using:
+
+- **Backend**: [Render](https://render.com) (free tier available)
+- **Frontend**: [Vercel](https://vercel.com) (free tier available)
+- **Database**: [MongoDB Atlas](https://mongodb.com/atlas) (free tier available)
+
+### Quick Deployment
+
+1. **Run the deployment script:**
+   ```bash
+   # On Windows:
+   deploy.bat
+   
+   # On Unix/Linux/Mac:
+   chmod +x deploy.sh
+   ./deploy.sh
+   ```
+
+2. **Follow the detailed guide:**
+   - [Complete Deployment Guide](DEPLOYMENT.md)
+
+### Deployment Features
+
+- ✅ **Production-ready security** (rate limiting, CORS, helmet)
+- ✅ **Automatic HTTPS** (provided by Render/Vercel)
+- ✅ **Continuous deployment** (auto-deploy on git push)
+- ✅ **Health monitoring** (automatic health checks)
+- ✅ **Environment management** (secure environment variables)
+- ✅ **Performance optimization** (compression, caching)
 
 ## API Documentation
 
-### Authentication Endpoints
-```http
-POST /api/auth/register
-POST /api/auth/login
-GET /api/auth/me
-POST /api/auth/logout
+API documentation is available at `/api-docs` when running the server.
+
+## Testing
+
+```bash
+# Run backend tests
+cd server
+npm test
+
+# Run frontend tests
+cd client
+npm test
 ```
 
-### User Endpoints
-```http
-GET /api/users
-POST /api/users
-GET /api/users/:id
-PUT /api/users/:id
-DELETE /api/users/:id
+## Project Structure
+
+```
+task-manager/
+├── client/                # React frontend
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── store/         # Redux store
+│   │   ├── services/      # API services
+│   │   └── utils/         # Utility functions
+│   └── env.example        # Frontend environment example
+├── server/                # Node.js backend
+│   ├── controllers/       # Route controllers
+│   ├── models/           # MongoDB models
+│   ├── routes/           # API routes
+│   ├── middleware/       # Express middleware
+│   └── env.example       # Backend environment example
+├── docker-compose.yml     # Docker configuration
+├── render.yaml           # Render deployment config
+├── vercel.json           # Vercel deployment config
+├── DEPLOYMENT.md         # Detailed deployment guide
+└── README.md             # Project documentation
 ```
 
-### Task Endpoints
-```http
-GET /api/tasks
-POST /api/tasks
-GET /api/tasks/:id
-PUT /api/tasks/:id
-DELETE /api/tasks/:id
-```
+## Troubleshooting
+
+### Common Issues:
+
+1. **401 Unauthorized Errors:**
+   - Ensure JWT_SECRET is set in server .env
+   - Check that token is being stored in localStorage
+   - Verify API URL configuration
+
+2. **MongoDB Connection Issues:**
+   - Ensure MongoDB is running
+   - Check MONGODB_URI in server .env
+   - Verify network connectivity
+
+3. **File Upload Issues:**
+   - Ensure uploads directory exists in server
+   - Check file size limits
+   - Verify file type restrictions
+
+4. **CORS Issues:**
+   - Check CLIENT_URL in server .env
+   - Ensure frontend and backend ports match
+
+5. **Deployment Issues:**
+   - Check [DEPLOYMENT.md](DEPLOYMENT.md) for detailed troubleshooting
+   - Verify environment variables are set correctly
+   - Check deployment logs in Render/Vercel dashboards
 
 ## Security
 
-### Best Practices
-1. **Authentication**
-   - Use strong passwords
-   - Enable 2FA
-   - Regular password updates
-   - Session management
+- 🔒 **JWT Authentication** with secure token handling
+- 🛡️ **Rate Limiting** to prevent abuse
+- 🔐 **CORS Protection** with configurable origins
+- 🚫 **Input Validation** and sanitization
+- 📝 **Security Headers** with Helmet.js
+- 🔑 **Environment Variables** for sensitive data
 
-2. **Data Protection**
-   - Data encryption
-   - Secure storage
-   - Regular backups
-   - Access control
+## Performance
 
-3. **API Security**
-   - Rate limiting
-   - Input validation
-   - CORS configuration
-   - Error handling
-
-## Deployment
-
-### Heroku Deployment
-1. **Create Heroku App**
-   ```bash
-   heroku create your-app-name
-   ```
-
-2. **Configure Environment**
-   ```bash
-   heroku config:set MONGODB_URI=your_mongodb_uri
-   heroku config:set JWT_SECRET=your_jwt_secret
-   ```
-
-3. **Deploy**
-   ```bash
-   git push heroku main
-   ```
-
-### Docker Deployment
-1. **Build Image**
-   ```bash
-   docker build -t flowpilot .
-   ```
-
-2. **Run Container**
-   ```bash
-   docker run -p 3000:3000 -p 5000:5000 flowpilot
-   ```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-   ```bash
-   git checkout -b feature/AmazingFeature
-   ```
-3. Commit your changes
-   ```bash
-   git commit -m 'Add some AmazingFeature'
-   ```
-4. Push to the branch
-   ```bash
-   git push origin feature/AmazingFeature
-   ```
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow the existing code style
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation
-
-## Support
-
-### Getting Help
-- **Documentation**: [FlowPilot Docs](https://docs.flowpilot.com)
-- **Email**: support@flowpilot.com
-- **Issues**: [GitHub Issues](https://github.com/yourusername/flowpilot/issues)
-- **Community**: [FlowPilot Community](https://community.flowpilot.com)
-
-### Common Issues
-1. **Installation Problems**
-   - Check Node.js version
-   - Verify MongoDB connection
-   - Check environment variables
-
-2. **Runtime Errors**
-   - Check server logs
-   - Verify database connection
-   - Check API endpoints
+- ⚡ **Compression** middleware for faster responses
+- 🗄️ **Database Indexing** for optimal queries
+- 📦 **Code Splitting** and lazy loading
+- 🎯 **Optimized Builds** with source map generation disabled
+- 🔄 **Caching** strategies for static assets
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-For detailed technical documentation, please refer to:
-- [SETUP.md](SETUP.md) - Detailed setup instructions
-- [FUNCTIONALITY.md](FUNCTIONALITY.md) - Complete feature documentation 
+MIT 

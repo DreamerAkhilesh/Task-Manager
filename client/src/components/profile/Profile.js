@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateExistingUser } from '../../store/slices/userSlice';
+import { logoutUser, fetchCurrentUser } from '../../store/thunks/authThunks';
 import { toast } from 'react-toastify';
 import {
   UserCircleIcon,
@@ -16,6 +17,19 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { isLoading, error } = useSelector((state) => state.users);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    // Only fetch once if user is not already fetched
+    if (token && user === null && !isLoading) {
+      dispatch(fetchCurrentUser());
+    }
+  }, [dispatch, user, isLoading]);
+  
+
+
+
 
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -99,7 +113,7 @@ const Profile = () => {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Loading profile...</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Loading profile... {console.log(user)} </h2>
         </div>
       </div>
     );

@@ -76,14 +76,14 @@ taskSchema.virtual('isOverdue').get(function () {
   return this.dueDate < new Date() && this.status !== 'completed';
 });
 
-// Method to check if task can have more documents
-taskSchema.methods.canAddDocument = function () {
-  return true; // Allow unlimited documents
+// Method to check if task can have more attachments
+taskSchema.methods.canAddAttachment = function () {
+  return true; // Allow unlimited attachments
 };
 
-// Method to add document
-taskSchema.methods.addDocument = function (document) {
-  this.documents.push(document);
+// Method to add attachment
+taskSchema.methods.addAttachment = function (attachment) {
+  this.attachments.push(attachment);
 };
 
 module.exports = mongoose.model('Task', taskSchema); 

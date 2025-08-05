@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCurrentUser } from './store/slices/authSlice';
+import { fetchCurrentUser } from './store/thunks/authThunks';
+import api from './services/api';
 
 // Layout
 import Layout from './components/layout/Layout';
@@ -9,9 +10,8 @@ import Layout from './components/layout/Layout';
 // Auth Components
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
-import ProtectedRoute from './components/auth/ProtectedRoute';
-import FirstAdminCreation from './components/auth/FirstAdminCreation';
 import PrivateRoute from './components/auth/PrivateRoute';
+import FirstAdminCreation from './components/auth/FirstAdminCreation';
 
 // Admin Components
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -24,9 +24,9 @@ import UserProfileView from './components/users/UserProfileView';
 import Dashboard from './components/dashboard/Dashboard';
 import TaskList from './components/tasks/TaskList';
 import TaskForm from './components/tasks/TaskForm';
-import UserProfile from './components/profile/UserProfile';
 import Reports from './components/reports/Reports';
 import Profile from './components/profile/Profile';
+import UserProfile from './components/profile/UserProfile';
 
 const router = {
   future: {
@@ -40,16 +40,21 @@ function App() {
   const { currentUser, isLoading: authLoading } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Attempt to get current user from token in localStorage on app load
+    // Initialize API token from localStorage
     const token = localStorage.getItem('token');
-    if (token && !currentUser) {
-      dispatch(getCurrentUser());
+    if (token) {
+      api.setAuthToken(token);
+      dispatch(fetchCurrentUser());
     }
-  }, [dispatch, currentUser]);
+  }, [dispatch]); // Remove currentUser dependency to prevent infinite loop
 
-  // You might want to show a global loading spinner here while auth state is being determined
+  // Show loading while auth state is being determined
   if (authLoading) {
-    return <div>Loading Application...</div>; 
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -58,38 +63,41 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/first-admin" element={<FirstAdminCreation />} />
+        <Route path="/create-first-admin" element={<FirstAdminCreation />} />
 
         {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route element={<Layout />}>
-            {/* Admin Routes */}
-            <Route path="/admin" element={<ProtectedRoute roles={['admin']} />}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="users" element={<UserList />} />
-              <Route path="users/new" element={<UserForm />} />
-              <Route path="users/:id" element={<UserForm />} />
-              <Route path="tasks" element={<TaskList />} />
-              <Route path="tasks/new" element={<TaskForm />} />
-              <Route path="tasks/:id/edit" element={<TaskForm />} />
-              <Route path="create-admin" element={<AdminCreation />} />
-              <Route path="reports" element={<Reports />} />
-            </Route>
+        <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
+          {/* Admin Routes */}
+          <Route path="/admin">
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<PrivateRoute roles={['admin']}><AdminDashboard /></PrivateRoute>} />
+            <Route path="users" element={<PrivateRoute roles={['admin']}><UserList /></PrivateRoute>} />
+            <Route path="users/new" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
+            <Route path="users/:id" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
+            <Route path="users/:userId/edit" element={<PrivateRoute roles={['admin']}><UserForm /></PrivateRoute>} />
+            <Route path="users/:userId/profile" element={<PrivateRoute roles={['admin']}><UserProfileView /></PrivateRoute>} />
+            <Route path="tasks" element={<PrivateRoute roles={['admin']}><TaskList /></PrivateRoute>} />
+            <Route path="tasks/new" element={<PrivateRoute roles={['admin']}><TaskForm /></PrivateRoute>} />
+            <Route path="tasks/:id/edit" element={<PrivateRoute roles={['admin']}><TaskForm /></PrivateRoute>} />
+            <Route path="create-admin" element={<PrivateRoute roles={['admin']}><AdminCreation /></PrivateRoute>} />
+            <Route path="reports" element={<PrivateRoute roles={['admin']}><Reports /></PrivateRoute>} />
+          </Route>
 
-            {/* User Routes */}
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/tasks" element={<TaskList />} />
-            <Route path="/tasks/new" element={<TaskForm />} />
-            <Route path="/tasks/:id/edit" element={<TaskForm />} />
-            <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/users/:userId/profile" element={<UserProfileView />} />
+          {/* User Routes */}
+          <Route path="/">
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="tasks" element={<TaskList />} />
+            <Route path="tasks/new" element={<TaskForm />} />
+            <Route path="tasks/:id/edit" element={<TaskForm />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="profile" element={<UserProfile />} />
           </Route>
         </Route>
 
-        {/* Redirect root to appropriate dashboard */}
-        <Route path="/" element={
+        {/* Fallback redirect */}
+        <Route path="*" element={
           currentUser?.role === 'admin' ? 
             <Navigate to="/admin/dashboard" replace /> : 
             <Navigate to="/dashboard" replace />

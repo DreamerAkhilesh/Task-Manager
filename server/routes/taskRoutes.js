@@ -6,7 +6,9 @@ const {
   getTasks,
   getTaskById,
   updateTask,
-  deleteTask
+  deleteTask,
+  uploadDocument,
+  deleteDocument
 } = require('../controllers/taskController');
 const { upload } = require('../utils/fileUpload');
 
@@ -27,5 +29,11 @@ router.put('/:id', upload.array('attachments'), updateTask);
 
 // Delete task
 router.delete('/:id', deleteTask);
+
+// Upload document to task
+router.post('/:id/documents', upload.single('document'), uploadDocument);
+
+// Delete document from task
+router.delete('/:id/documents/:docId', deleteDocument);
 
 module.exports = router; 

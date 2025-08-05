@@ -7,12 +7,16 @@ import { fetchUsers } from '../../store/thunks/userThunks';
 const AdminDashboard = () => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
-  const { tasks, isLoading: tasksLoading } = useSelector((state) => state.tasks);
-  const { users, isLoading: usersLoading } = useSelector((state) => state.users);
+  const { tasks = [], isLoading: tasksLoading } = useSelector((state) => state.tasks);
+  const { users = [], isLoading: usersLoading } = useSelector((state) => state.users);
+
+  // Debug logging
+  console.log('AdminDashboard render - users:', users, 'type:', typeof users, 'isArray:', Array.isArray(users));
+  console.log('AdminDashboard render - tasks:', tasks, 'type:', typeof tasks, 'isArray:', Array.isArray(tasks));
 
   useEffect(() => {
     dispatch(fetchTasks({ page: 1, limit: 5 }));
-    dispatch(fetchUsers({ page: 1, limit: 5 }));
+    dispatch(fetchUsers());
   }, [dispatch]);
 
   const getTaskStatusCount = (status) => {
@@ -21,10 +25,14 @@ const AdminDashboard = () => {
 
   const getDueTodayCount = () => {
     const today = new Date().toISOString().split('T')[0];
-    return tasks?.filter(task => task.dueDate.split('T')[0] === today).length || 0;
+    return tasks?.filter(task => task.dueDate && task.dueDate.split('T')[0] === today).length || 0;
   };
 
   const isLoading = tasksLoading || usersLoading;
+
+  // Ensure users and tasks are arrays
+  const safeUsers = Array.isArray(users) ? users : [];
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
 
   if (isLoading) {
     return (
@@ -62,7 +70,7 @@ const AdminDashboard = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
-          <p className="text-4xl font-bold mt-2">{users.length}</p>
+          <p className="text-4xl font-bold mt-2">{safeUsers.length}</p>
         </div>
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
           <div className="flex items-center justify-between">
@@ -71,7 +79,7 @@ const AdminDashboard = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
-          <p className="text-4xl font-bold mt-2">{tasks.length}</p>
+          <p className="text-4xl font-bold mt-2">{safeTasks.length}</p>
         </div>
         <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
           <div className="flex items-center justify-between">
@@ -173,7 +181,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.slice(0, 5).map((user) => (
+              {safeUsers?.slice(0, 5)?.map((user) => (
                 <tr key={user._id} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -258,7 +266,7 @@ const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tasks.slice(0, 5).map((task) => (
+              {safeTasks?.slice(0, 5)?.map((task) => (
                 <tr key={task._id} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{task.title}</div>

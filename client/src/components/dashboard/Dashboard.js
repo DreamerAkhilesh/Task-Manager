@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchTasks } from '../../store/thunks/taskThunks';
@@ -8,14 +8,20 @@ const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.auth);
   const { tasks, isLoading } = useSelector((state) => state.tasks);
 
+  // Memoize the fetch function to prevent unnecessary re-renders
+  const fetchUserTasks = useCallback(() => {
+    if (currentUser?._id) {
+      dispatch(fetchTasks({ 
+        page: 1, 
+        limit: 5,
+        assignedTo: currentUser._id 
+      }));
+    }
+  }, [dispatch, currentUser?._id]);
+
   useEffect(() => {
-    // Fetch tasks with filter for assigned user
-    dispatch(fetchTasks({ 
-      page: 1, 
-      limit: 5,
-      assignedTo: currentUser._id 
-    }));
-  }, [dispatch, currentUser._id]);
+    fetchUserTasks();
+  }, [fetchUserTasks]);
 
   const getTaskStatusCount = (status) => {
     return tasks?.filter(task => task.status === status).length || 0;
@@ -23,7 +29,7 @@ const Dashboard = () => {
 
   const getDueTodayCount = () => {
     const today = new Date().toISOString().split('T')[0];
-    return tasks?.filter(task => task.dueDate.split('T')[0] === today).length || 0;
+    return tasks?.filter(task => task.dueDate && task.dueDate.split('T')[0] === today).length || 0;
   };
 
   if (isLoading) {
@@ -62,7 +68,7 @@ const Dashboard = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
-          <p className="text-4xl font-bold mt-2">{tasks.length}</p>
+          <p className="text-4xl font-bold mt-2">{tasks?.length || 0}</p>
         </div>
         <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
           <div className="flex items-center justify-between">
@@ -131,7 +137,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tasks.slice(0, 5).map((task) => (
+              {tasks?.slice(0, 5).map((task) => (
                 <tr key={task._id} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{task.title}</div>
@@ -155,7 +161,7 @@ const Dashboard = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(task.dueDate).toLocaleDateString()}
+                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">

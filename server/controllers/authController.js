@@ -171,12 +171,13 @@ exports.login = async (req, res, next) => {
     if (!user) {
       return next(createError(401, 'Invalid email or password'));
     }
-
+    console.log("Login requested:", email);
     // Check if password matches
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return next(createError(401, 'Invalid email or password'));
     }
+    console.log("✅ Password matched");
 
     // Check if user is active
     if (!user.isActive) {
@@ -189,7 +190,14 @@ exports.login = async (req, res, next) => {
 
     // Generate token
     const token = generateToken(user._id);
-
+    console.log("✅ Sending response:", {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      token
+    });
     res.status(200).json({
       success: true,
       data: {

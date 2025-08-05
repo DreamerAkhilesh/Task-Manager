@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { getUsers, deleteExistingUser, updateExistingUser } from '../../store/slices/userSlice';
+import { getUsers, deleteExistingUser, updateExistingUser, getUserById } from '../../store/slices/userSlice';
 import { getTasks } from '../../store/slices/taskSlice';
 import { Menu, Transition } from '@headlessui/react';
 import {
@@ -24,8 +24,11 @@ import {
   XMarkIcon,
   UserGroupIcon,
   ShieldCheckIcon,
-  ShieldExclamationIcon
+  ShieldExclamationIcon,
+  PencilIcon
 } from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
+import UserProfileModal from './UserProfileModal';
 
 const UserList = () => {
   const dispatch = useDispatch();
@@ -42,6 +45,9 @@ const UserList = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [selectedUserForProfile, setSelectedUserForProfile] = useState(null);
 
   useEffect(() => {
     dispatch(getUsers());
@@ -101,6 +107,15 @@ const UserList = () => {
     );
   };
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'role') {
+      setRoleFilter(value);
+    } else if (name === 'status') {
+      setStatusFilter(value);
+    }
+  };
+
   const filteredUsers = users
     .filter(user => {
       const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -146,18 +161,32 @@ const UserList = () => {
     };
   };
 
-  const handleDelete = async (userId) => {
+  const handleDelete = (userId) => {
+    setSelectedUser(userId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await dispatch(deleteExistingUser(userId)).unwrap();
+      await dispatch(deleteExistingUser(selectedUser)).unwrap();
+      toast.success('User deleted successfully');
       setShowDeleteModal(false);
-      setUserToDelete(null);
-    } catch (error) {
-      console.error('Failed to delete user:', error);
+      setSelectedUser(null);
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete user');
     }
   };
 
+  const handleEdit = (userId) => {
+    navigate(`/users/${userId}/edit`);
+  };
+
   const handleViewProfile = (userId) => {
-    navigate(`/users/${userId}/profile`);
+    const user = users.find(u => u._id === userId);
+    if (user) {
+      setSelectedUserForProfile(user);
+      setShowProfileModal(true);
+    }
   };
 
   if (isLoading) {
@@ -234,7 +263,8 @@ const UserList = () => {
               </label>
               <select
                 value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                onChange={handleFilterChange}
+                name="role"
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Roles</option>
@@ -249,7 +279,8 @@ const UserList = () => {
               </label>
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={handleFilterChange}
+                name="status"
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Statuses</option>
@@ -430,54 +461,66 @@ const UserList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handleViewProfile(user._id)}
-                          className="text-indigo-600 hover:text-indigo-900"
-                          title="View Profile"
+                      <Menu as="div" className="relative inline-block text-left">
+                        <Menu.Button className="p-2 rounded-lg hover:bg-gray-100">
+                          <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
+                        </Menu.Button>
+                        <Transition
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
                         >
-                          <EyeIcon className="h-5 w-5" />
-                        </button>
-                        <Menu as="div" className="relative inline-block text-left">
-                          <Menu.Button className="p-2 rounded-lg hover:bg-gray-100">
-                            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
-                          </Menu.Button>
-                          <Transition
-                            enter="transition ease-out duration-100"
-                            enterFrom="transform opacity-0 scale-95"
-                            enterTo="transform opacity-100 scale-100"
-                            leave="transition ease-in duration-75"
-                            leaveFrom="transform opacity-100 scale-100"
-                            leaveTo="transform opacity-0 scale-95"
-                          >
-                            <Menu.Items className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              <div className="py-1">
-                                <Menu.Item>
+                          <Menu.Items className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <div className="py-1">
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <button
+                                    onClick={() => handleViewProfile(user._id)}
+                                    className={`${
+                                      active ? 'bg-gray-100' : ''
+                                    } flex items-center w-full px-4 py-2 text-sm text-gray-700`}
+                                  >
+                                    <EyeIcon className="h-5 w-5 mr-2" />
+                                    View Profile
+                                  </button>
+                                )}
+                              </Menu.Item>
+                              <Menu.Item>
+                                {({ active }) => (
                                   <Link
                                     to={`/users/${user._id}/edit`}
-                                    className="flex items-center px-4 py-2 text-sm text-gray-700"
+                                    className={`${
+                                      active ? 'bg-gray-100' : ''
+                                    } flex items-center px-4 py-2 text-sm text-gray-700`}
                                   >
-                                    <PencilSquareIcon className="h-5 w-5 mr-2" />
+                                    <PencilIcon className="h-5 w-5 mr-2" />
                                     Edit User
                                   </Link>
-                                </Menu.Item>
-                                <Menu.Item>
+                                )}
+                              </Menu.Item>
+                              <Menu.Item>
+                                {({ active }) => (
                                   <button
                                     onClick={() => {
                                       setUserToDelete(user._id);
                                       setShowDeleteModal(true);
                                     }}
-                                    className="flex items-center w-full px-4 py-2 text-sm text-red-600"
+                                    className={`${
+                                      active ? 'bg-gray-100' : ''
+                                    } flex items-center w-full px-4 py-2 text-sm text-red-600`}
                                   >
                                     <TrashIcon className="h-5 w-5 mr-2" />
                                     Delete User
                                   </button>
-                                </Menu.Item>
-                              </div>
-                            </Menu.Items>
-                          </Transition>
-                        </Menu>
-                      </div>
+                                )}
+                              </Menu.Item>
+                            </div>
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
                     </td>
                   </tr>
                 );
@@ -486,6 +529,17 @@ const UserList = () => {
           </table>
         </div>
       </div>
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        user={selectedUserForProfile}
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false);
+          setSelectedUserForProfile(null);
+        }}
+        tasks={tasks}
+      />
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
@@ -517,7 +571,7 @@ const UserList = () => {
                 Cancel
               </button>
               <button
-                onClick={() => handleDelete(userToDelete)}
+                onClick={confirmDelete}
                 className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
               >
                 Delete

@@ -1,75 +1,66 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../services/api';
+import api from '../../services/api'; // Ensure this path is correct based on your structure
 
-// Get user from localStorage for auth header
-const getStoredUser = () => {
+// Fetch all users
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, thunkAPI) => {
   try {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    const response = await api.get('/users');
+    console.log('fetchUsers response:', response.data);
+    
+    // Handle different response structures
+    if (response.data && response.data.data) {
+      // If response has nested data structure
+      return response.data.data;
+    } else if (Array.isArray(response.data)) {
+      // If response is directly an array
+      return response.data;
+    } else {
+      // Fallback to empty array
+      console.warn('Unexpected response structure:', response.data);
+      return [];
+    }
   } catch (error) {
-    console.error('Error parsing user from localStorage:', error);
-    return null;
+    console.error('fetchUsers error:', error);
+    return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to fetch users');
   }
-};
+});
 
-const user = getStoredUser();
-const token = user?.token;
-
-// Get all users
-export const fetchUsers = createAsyncThunk(
-  'users/fetchUsers',
-  async ({ page = 1, limit = 10, role, search }, { rejectWithValue }) => {
-    try {
-      const params = new URLSearchParams({
-        page,
-        limit,
-        ...(role && { role }),
-        ...(search && { search }),
-      });
-
-      const response = await api.get(`/users?${params}`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error);
-    }
+// Fetch user by ID
+export const fetchUserById = createAsyncThunk('users/fetchUserById', async (id, thunkAPI) => {
+  try {
+    const response = await api.get(`/users/${id}`);
+    return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data.message);
   }
-);
+});
 
-// Get single user
-export const fetchUser = createAsyncThunk(
-  'users/fetchUser',
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await api.get(`/users/${id}`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error);
-    }
+// Create user
+export const createNewUser = createAsyncThunk('users/createNewUser', async (userData, thunkAPI) => {
+  try {
+    const response = await api.post('/users', userData);
+    return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data.message);
   }
-);
+});
 
 // Update user
-export const updateExistingUser = createAsyncThunk(
-  'users/updateExistingUser',
-  async ({ id, userData }, { rejectWithValue }) => {
-    try {
-      const response = await api.put(`/users/${id}`, userData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error);
-    }
+export const updateExistingUser = createAsyncThunk('users/updateExistingUser', async ({ id, updatedData }, thunkAPI) => {
+  try {
+    const response = await api.put(`/users/${id}`, updatedData);
+    return response.data;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data.message);
   }
-);
+});
 
 // Delete user
-export const deleteExistingUser = createAsyncThunk(
-  'users/deleteExistingUser',
-  async (id, { rejectWithValue }) => {
-    try {
-      await api.delete(`/users/${id}`);
-      return id;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error);
-    }
+export const deleteExistingUser = createAsyncThunk('users/deleteExistingUser', async (id, thunkAPI) => {
+  try {
+    await api.delete(`/users/${id}`);
+    return id;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data.message);
   }
-); 
+});
