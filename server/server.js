@@ -16,8 +16,28 @@ const taskRoutes = require('./routes/taskRoutes');
 const app = express();
 
 // CORS configuration - MUST BE FIRST
+const vercelRegex = /https:\/\/.*\.vercel\.app$/;
+const allowedOriginsStatic = [
+  process.env.CLIENT_URL,
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://localhost:3000',
+  'https://task-manager-ruddy-five-34.vercel.app'
+].filter(Boolean);
+
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://localhost:3000'],
+  origin: function (origin, callback) {
+    // Allow same-origin or non-browser requests
+    if (!origin) return callback(null, true);
+    if (
+      allowedOriginsStatic.includes(origin) ||
+      vercelRegex.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    console.warn('CORS blocked origin:', origin);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
@@ -27,7 +47,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 // Handle preflight requests
 app.options('*', cors(corsOptions));
 
@@ -48,8 +67,8 @@ app.use(compression());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.'
@@ -99,7 +118,6 @@ app.use(errorHandler);
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Promise Rejection:', err);
-  // Close server & exit process
   process.exit(1);
 });
 
@@ -130,7 +148,6 @@ const startServer = async () => {
       console.log(`API URL: http://localhost:${PORT}/api`);
     });
 
-    // Handle server errors
     server.on('error', (error) => {
       if (error.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use`);
