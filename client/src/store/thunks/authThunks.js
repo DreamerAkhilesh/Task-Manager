@@ -45,7 +45,8 @@ export const registerUser = createAsyncThunk(
         api.setAuthToken(res.data.data.token);
       }
       
-      return res.data;
+      // Return only the user data
+      return res.data.data;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data?.message || 'Registration failed');
     }
