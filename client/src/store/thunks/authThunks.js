@@ -2,6 +2,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
+// Ensure token is set on init if present
+const existingToken = localStorage.getItem('token');
+if (existingToken) {
+  api.setAuthToken(existingToken);
+}
+
 // Login User
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
@@ -64,13 +70,18 @@ export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, thunkAPI) => {
     try {
-      await api.post('/auth/logout');
-      // Clear token from localStorage and API headers
+      // Proactively clear token regardless of API outcome
       localStorage.removeItem('token');
       api.setAuthToken(null);
+      // Fire and forget server call; if it fails due to CORS, we still log out locally
+      try {
+        await api.post('/auth/logout');
+      } catch (e) {
+        // ignore network/CORS errors on logout
+      }
       return true;
     } catch (err) {
-      // Even if logout API fails, clear local token
+      // Ensure local state is cleared even on error
       localStorage.removeItem('token');
       api.setAuthToken(null);
       return thunkAPI.rejectWithValue('Logout failed');

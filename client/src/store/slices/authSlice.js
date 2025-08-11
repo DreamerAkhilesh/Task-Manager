@@ -37,6 +37,8 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+        state.isAuthenticated = false;
+        state.currentUser = null;
       })
 
       // Register
@@ -70,9 +72,22 @@ const authSlice = createSlice({
       })
 
       // Logout
+      .addCase(logoutUser.pending, (state) => {
+        // Proactively clear auth on logout start to avoid stale state
+        state.currentUser = null;
+        state.isAuthenticated = false;
+        state.isLoading = true;
+      })
       .addCase(logoutUser.fulfilled, (state) => {
         state.currentUser = null;
         state.isAuthenticated = false;
+        state.isLoading = false;
+      })
+      .addCase(logoutUser.rejected, (state) => {
+        // Even if API fails (e.g., CORS), keep the user logged out locally
+        state.currentUser = null;
+        state.isAuthenticated = false;
+        state.isLoading = false;
       });
   },
 });

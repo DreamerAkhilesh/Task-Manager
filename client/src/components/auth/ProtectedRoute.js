@@ -11,10 +11,12 @@ const ProtectedRoute = ({ roles = [], requiredRole, children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token && !currentUser && !isLoading) {
+    // Avoid fetching on login/register routes
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/create-first-admin';
+    if (!isAuthPage && token && !currentUser && !isLoading) {
       dispatch(fetchCurrentUser());
     }
-  }, [dispatch, currentUser, isLoading]);
+  }, [dispatch, currentUser, isLoading, location.pathname]);
 
   if (isLoading) {
     return (
