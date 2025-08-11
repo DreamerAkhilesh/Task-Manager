@@ -178,7 +178,7 @@ const UserList = () => {
   };
 
   const handleEdit = (userId) => {
-    navigate(`/users/${userId}/edit`);
+    navigate(`/admin/users/${userId}`);
   };
 
   const handleViewProfile = (userId) => {
@@ -228,7 +228,7 @@ const UserList = () => {
               <FunnelIcon className="h-5 w-5" />
             </button>
             <Link
-              to="/users/new"
+              to="/admin/users/new"
               className="px-4 py-2 rounded-lg bg-white text-blue-600 hover:bg-blue-50 transition-colors duration-200 flex items-center gap-2"
             >
               <PlusIcon className="h-5 w-5" />
@@ -491,7 +491,7 @@ const UserList = () => {
                               <Menu.Item>
                                 {({ active }) => (
                                   <Link
-                                    to={`/users/${user._id}/edit`}
+                                    to={`/admin/users/${user._id}`}
                                     className={`${
                                       active ? 'bg-gray-100' : ''
                                     } flex items-center px-4 py-2 text-sm text-gray-700`}

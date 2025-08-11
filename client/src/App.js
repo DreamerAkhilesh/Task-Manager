@@ -189,6 +189,36 @@ function App() {
               }
             />
             <Route
+              path="/admin/tasks/new"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <TaskForm />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/tasks/:id"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <TaskForm />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/tasks/:id/details"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <Layout>
+                    <TaskDetails />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/reports"
               element={
                 <ProtectedRoute requiredRole="admin">

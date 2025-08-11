@@ -136,11 +136,19 @@ const TaskList = () => {
   };
 
   const handleEdit = (taskId) => {
-    navigate(`/tasks/${taskId}`);
+    if (currentUser?.role === 'admin') {
+      navigate(`/admin/tasks/${taskId}`);
+    } else {
+      navigate(`/tasks/${taskId}`);
+    }
   };
 
   const handleViewDetails = (taskId) => {
-    navigate(`/tasks/${taskId}/details`);
+    if (currentUser?.role === 'admin') {
+      navigate(`/admin/tasks/${taskId}/details`);
+    } else {
+      navigate(`/tasks/${taskId}/details`);
+    }
   };
 
   const filteredTasks = tasks
@@ -257,7 +265,7 @@ const TaskList = () => {
               {showStats ? "Hide Stats" : "Show Stats"}
             </Button>
             <Link
-              to="/tasks/new"
+              to={currentUser?.role === 'admin' ? '/admin/tasks/new' : '/tasks/new'}
               className="px-4 py-2 rounded-lg bg-white text-blue-600 hover:bg-blue-50 transition-colors duration-200 flex items-center gap-2"
             >
               <PlusIcon className="h-5 w-5" />
