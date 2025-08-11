@@ -137,7 +137,7 @@ This application is configured for easy deployment to production using:
 
 ### ✅ Backend Integration Status
 
-The backend is **successfully deployed** and integrated:
+The backend is **successfully deployed** and integrated at: [Backend](https://task-manager-api-r4tk.onrender.com)
 
 - **Backend URL**: `https://task-manager-api-r4tk.onrender.com`
 - **Health Check**: ✅ Working
