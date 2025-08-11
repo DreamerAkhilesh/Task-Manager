@@ -41,7 +41,7 @@ const UserList = () => {
   const [sortField, setSortField] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  // const [userToDelete, setUserToDelete] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);

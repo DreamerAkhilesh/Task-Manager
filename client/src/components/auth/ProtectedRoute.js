@@ -4,13 +4,12 @@ import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { fetchCurrentUser } from '../../store/thunks/authThunks';
 import PropTypes from 'prop-types';
 
-const ProtectedRoute = ({ roles = [] }) => {
+const ProtectedRoute = ({ roles = [], requiredRole, children }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { currentUser, isAuthenticated, isLoading } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Only fetch user if we have a token but no user data
     const token = localStorage.getItem('token');
     if (token && !currentUser && !isLoading) {
       dispatch(fetchCurrentUser());
@@ -29,18 +28,21 @@ const ProtectedRoute = ({ roles = [] }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (roles.length > 0) {
-    const hasRequiredRole = roles.includes(currentUser?.role);
+  const effectiveRoles = requiredRole ? [requiredRole] : roles;
+  if (effectiveRoles.length > 0) {
+    const hasRequiredRole = effectiveRoles.includes(currentUser?.role);
     if (!hasRequiredRole) {
       return <Navigate to="/unauthorized" replace />;
     }
   }
 
-  return <Outlet />;
+  return children || <Outlet />;
 };
 
 ProtectedRoute.propTypes = {
   roles: PropTypes.array,
+  requiredRole: PropTypes.string,
+  children: PropTypes.node,
 };
 
 export default ProtectedRoute; 

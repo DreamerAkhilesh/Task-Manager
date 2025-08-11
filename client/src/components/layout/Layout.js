@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { logoutUser } from '../../store/thunks/authThunks';
 
-const Layout = () => {
+const Layout = ({ children }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.auth);
@@ -166,7 +166,7 @@ const Layout = () => {
         {/* Page content */}
         <main className="py-6 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <Outlet />
+            {children || <Outlet />}
           </div>
         </main>
       </div>
