@@ -41,15 +41,15 @@ const authSlice = createSlice({
         state.currentUser = null;
       })
 
-      // Register
+      // Register (do not authenticate user on register)
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.isLoading = false;
-        state.currentUser = action.payload;
-        state.isAuthenticated = true;
+        state.isAuthenticated = false;
+        state.currentUser = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -73,7 +73,6 @@ const authSlice = createSlice({
 
       // Logout
       .addCase(logoutUser.pending, (state) => {
-        // Proactively clear auth on logout start to avoid stale state
         state.currentUser = null;
         state.isAuthenticated = false;
         state.isLoading = true;
@@ -84,7 +83,6 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(logoutUser.rejected, (state) => {
-        // Even if API fails (e.g., CORS), keep the user logged out locally
         state.currentUser = null;
         state.isAuthenticated = false;
         state.isLoading = false;
