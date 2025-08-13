@@ -127,7 +127,7 @@ cd ../client
 npm start
 ```
 
-7. Create First Admin:
+7. Create First Admin: (This route should be used to create Admin)
 - Visit `http://localhost:3000/create-first-admin`
 - Create your first admin account
 
