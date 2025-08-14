@@ -31,12 +31,21 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline";
 
+/**
+ * TaskList Component - Renders a list of tasks with filtering, sorting and bulk actions
+ * Handles different views based on user roles (admin/regular user)
+ */
 const TaskList = () => {
+  // Redux hooks for dispatching actions and accessing store state
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // Get current user, tasks and users from Redux store
   const { currentUser } = useSelector((state) => state.auth);
   const { tasks = [], isLoading, error } = useSelector((state) => state.tasks);
   const { users = [] } = useSelector((state) => state.users);
+  
+  // State for filtering and search functionality
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
@@ -69,22 +78,34 @@ const TaskList = () => {
     }
   }, [dispatch, currentUser]);
 
+  /**
+   * Handles sorting of tasks by specified field
+   * @param {string} field - The field to sort by (e.g., 'dueDate', 'priority')
+   */
   const handleSort = (field) => {
     if (sortField === field) {
+      // If already sorting by this field, toggle direction
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
+      // If sorting by new field, set it and default to ascending
       setSortField(field);
       setSortDirection("asc");
     }
   };
 
+  /**
+   * Updates status of multiple selected tasks at once
+   * @param {string} status - The new status to set for selected tasks
+   */
   const handleBulkStatusChange = async (status) => {
     try {
+      // Update all selected tasks in parallel
       await Promise.all(
         selectedTasks.map((taskId) =>
           dispatch(updateTask({ id: taskId, taskData: { status } })).unwrap()
         )
       );
+      // Reset selection state after successful update
       setSelectedTasks([]);
       setShowBulkActions(false);
     } catch (error) {
@@ -92,11 +113,16 @@ const TaskList = () => {
     }
   };
 
+  /**
+   * Deletes multiple selected tasks at once
+   */
   const handleBulkDelete = async () => {
     try {
+      // Delete all selected tasks in parallel
       await Promise.all(
         selectedTasks.map((taskId) => dispatch(deleteTask(taskId)).unwrap())
       );
+      // Reset selection state after successful deletion
       setSelectedTasks([]);
       setShowBulkActions(false);
     } catch (error) {
@@ -104,27 +130,43 @@ const TaskList = () => {
     }
   };
 
+  /**
+   * Toggles selection state of a task
+   * @param {string} taskId - The ID of the task to toggle selection
+   */
   const handleTaskSelect = (taskId) => {
     setSelectedTasks((prev) =>
       prev.includes(taskId)
-        ? prev.filter((id) => id !== taskId)
-        : [...prev, taskId]
+        ? prev.filter((id) => id !== taskId) // Deselect if already selected
+        : [...prev, taskId] // Select if not already selected
     );
   };
 
+  /**
+   * Toggles selection of all tasks in the filtered list
+   * If all tasks are selected, deselects all. Otherwise, selects all filtered tasks.
+   */
   const handleSelectAll = () => {
     setSelectedTasks((prev) =>
       prev.length === filteredTasks.length
-        ? []
-        : filteredTasks.map((task) => task._id)
+        ? [] // Deselect all if all are selected
+        : filteredTasks.map((task) => task._id) // Select all filtered tasks
     );
   };
 
+  /**
+   * Opens delete confirmation modal for a specific task
+   * @param {string} taskId - ID of the task to be deleted
+   */
   const handleDelete = async (taskId) => {
     setTaskToDelete(taskId);
     setShowDeleteModal(true);
   };
 
+  /**
+   * Handles the actual deletion of a task after confirmation
+   * Dispatches delete action and cleans up modal state
+   */
   const confirmDelete = async () => {
     try {
       await dispatch(deleteTask(taskToDelete)).unwrap();
@@ -135,6 +177,11 @@ const TaskList = () => {
     }
   };
 
+  /**
+   * Navigates to the task edit page based on user role
+   * Admin users are directed to admin route, regular users to standard route
+   * @param {string} taskId - ID of the task to edit
+   */
   const handleEdit = (taskId) => {
     if (currentUser?.role === 'admin') {
       navigate(`/admin/tasks/${taskId}`);
@@ -143,6 +190,11 @@ const TaskList = () => {
     }
   };
 
+  /**
+   * Navigates to the task details page based on user role
+   * Admin users see additional information in their view
+   * @param {string} taskId - ID of the task to view
+   */
   const handleViewDetails = (taskId) => {
     if (currentUser?.role === 'admin') {
       navigate(`/admin/tasks/${taskId}/details`);
@@ -151,17 +203,31 @@ const TaskList = () => {
     }
   };
 
+  /**
+   * Filters and sorts tasks based on search term, status, priority, and assignee
+   * Also applies current sort field and direction
+   * @type {Array} filteredTasks - Array of filtered and sorted tasks
+   */
   const filteredTasks = tasks
     .filter((task) => {
+      // Match task against search term (title or description)
       const matchesSearch =
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.description.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Match task against status filter
       const matchesStatus =
         statusFilter === "all" || task.status === statusFilter;
+      
+      // Match task against priority filter
       const matchesPriority =
         priorityFilter === "all" || task.priority === priorityFilter;
+      
+      // Match task against assignee filter (for admin view)
       const matchesAssignedTo =
         assignedToFilter === "all" || task.assignedTo?._id === assignedToFilter;
+      
+      // Return true only if all filters match
       return (
         matchesSearch && matchesStatus && matchesPriority && matchesAssignedTo
       );
@@ -180,6 +246,11 @@ const TaskList = () => {
       return direction * (a[sortField]?.localeCompare(b[sortField]) || 0);
     });
 
+  /**
+   * Calculate task statistics for the dashboard
+   * Includes total tasks, tasks by status, priority tasks, and tasks due today
+   * @type {Object} stats - Object containing various task statistics
+   */
   const stats = {
     total: tasks.length,
     completed: tasks.filter((task) => task.status === "completed").length,
@@ -193,6 +264,11 @@ const TaskList = () => {
     }).length,
   };
 
+  /**
+   * Returns the Tailwind CSS class for status background color
+   * @param {string} status - The task status ('completed', 'in_progress', or 'pending')
+   * @returns {string} The Tailwind CSS gradient class for the status
+   */
   const getStatusColor = (status) => {
     switch (status) {
       case "completed":
@@ -206,6 +282,11 @@ const TaskList = () => {
     }
   };
 
+  /**
+   * Returns the Tailwind CSS class for priority background color
+   * @param {string} priority - The task priority ('high', 'medium', or 'low')
+   * @returns {string} The Tailwind CSS gradient class for the priority
+   */
   const getPriorityColor = (priority) => {
     switch (priority) {
       case "high":
