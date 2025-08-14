@@ -15,18 +15,18 @@ const { protect, authorize } = require('../middleware/auth');
 router.use(protect);
 
 // Admin only routes
-router.use(authorize('admin'));
+router.use(authorize('admin')) ;
 
 router.route('/')
   .get(getUsers)
-  .post(createUser);
+  .post(createUser) ;
 
 router.route('/:id')
   .get(getUser)
   .put(updateUser)
-  .delete(deleteUser);
+  .delete(deleteUser) ;
 
-router.put('/:id/toggle-status', toggleUserStatus);
-router.put('/:id/role', updateUserRole);
+router.put('/:id/toggle-status', toggleUserStatus) ;
+router.put('/:id/role', updateUserRole) ;
 
-module.exports = router; 
+module.exports = router ; 

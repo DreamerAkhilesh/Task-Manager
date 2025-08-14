@@ -3,6 +3,7 @@ import authReducer from './slices/authSlice';
 import taskReducer from './slices/taskSlice';
 import userReducer from './slices/userSlice';
 
+// const store = configureStore(reducer , middleware) ;
 const store = configureStore({
   reducer: {
     auth: authReducer,

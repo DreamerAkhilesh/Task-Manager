@@ -256,7 +256,7 @@ const TaskList = () => {
                 : "Manage and track your assigned tasks"}
             </p>
           </div>
-          <div className="flex space-x-4">
+          <div className="flex swpace-x-4">
             <Button
               onClick={() => setShowStats(!showStats)}
               className="bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all duration-200 flex items-center gap-2"
