@@ -1,7 +1,21 @@
+/**
+ * Task Thunks Module
+ * Contains all async action creators (thunks) for task-related operations
+ * Handles API communication, error handling, and data validation
+ */
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import taskService from '../../services/taskService';
 
+/**
+ * Fetch all tasks with optional filtering parameters
+ * @param {Object} params - Query parameters for filtering tasks
+ * @param {string} [params.assignedTo] - Filter tasks by assigned user ID
+ * @param {string} [params.status] - Filter tasks by status
+ * @param {string} [params.priority] - Filter tasks by priority
+ * @returns {Promise<Object>} Object containing tasks array and pagination data
+ */
 export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
   async (params = {}, { rejectWithValue }) => {
@@ -17,6 +31,11 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
+/**
+ * Fetch a single task by its ID
+ * @param {string} id - The ID of the task to fetch
+ * @returns {Promise<Object>} The task data
+ */
 export const fetchTask = createAsyncThunk(
   'tasks/fetchTask',
   async (id, { rejectWithValue }) => {
@@ -29,6 +48,19 @@ export const fetchTask = createAsyncThunk(
   }
 );
 
+/**
+ * Create a new task with attachments support
+ * @param {FormData} taskData - Form data containing task details and attachments
+ * @param {string} taskData.title - Task title
+ * @param {string} taskData.description - Task description
+ * @param {string} taskData.status - Task status (pending/in_progress/completed)
+ * @param {string} taskData.priority - Task priority (high/medium/low)
+ * @param {string} taskData.dueDate - Task due date
+ * @param {string} taskData.assignedTo - ID of user assigned to task
+ * @param {File[]} [taskData.attachments] - Optional PDF attachments
+ * @returns {Promise<Object>} The created task data
+ * @throws {Error} If required fields are missing or file types are invalid
+ */
 export const createNewTask = createAsyncThunk(
   'tasks/createTask',
   async (taskData, { rejectWithValue }) => {
@@ -83,13 +115,27 @@ export const createNewTask = createAsyncThunk(
   }
 );
 
+/**
+ * Update an existing task including attachments
+ * @param {Object} params - Update parameters
+ * @param {string} params.id - ID of the task to update
+ * @param {Object} params.taskData - New task data
+ * @param {string} [params.taskData.title] - Updated task title
+ * @param {string} [params.taskData.description] - Updated task description
+ * @param {string} [params.taskData.status] - Updated task status
+ * @param {string} [params.taskData.priority] - Updated task priority
+ * @param {string} [params.taskData.dueDate] - Updated due date
+ * @param {string} [params.taskData.assignedTo] - Updated assignee ID
+ * @param {File[]} [params.taskData.attachments] - New attachments to add
+ * @returns {Promise<Object>} The updated task data
+ */
 export const updateExistingTask = createAsyncThunk(
   'tasks/updateTask',
   async ({ id, taskData }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
       
-      // Append task data
+      // Append task data (excluding attachments field)
       Object.entries(taskData).forEach(([key, value]) => {
         if (key !== 'attachments') {
           formData.append(key, value);
@@ -115,18 +161,31 @@ export const updateExistingTask = createAsyncThunk(
   }
 );
 
+/**
+ * Delete an existing task
+ * @param {string} id - ID of the task to delete
+ * @returns {Promise<string>} The ID of the deleted task
+ * Used by the reducer to remove the task from state
+ */
 export const deleteExistingTask = createAsyncThunk(
   'tasks/deleteTask',
   async (id, { rejectWithValue }) => {
     try {
       await api.delete(`/tasks/${id}`);
-      return id;
+      return id; // Return ID for state updates
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
 
+/**
+ * Upload a document to an existing task
+ * @param {Object} params - Upload parameters
+ * @param {string} params.taskId - ID of the task to attach document to
+ * @param {File} params.file - The file to upload
+ * @returns {Promise<Object>} The uploaded document data
+ */
 export const uploadTaskDocument = createAsyncThunk(
   'tasks/uploadDocument',
   async ({ taskId, file }, { rejectWithValue }) => {
@@ -139,12 +198,19 @@ export const uploadTaskDocument = createAsyncThunk(
   }
 );
 
+/**
+ * Delete a document from a task
+ * @param {Object} params - Delete parameters
+ * @param {string} params.taskId - ID of the task containing the document
+ * @param {string} params.docId - ID of the document to delete
+ * @returns {Promise<Object>} Object containing taskId and docId for state updates
+ */
 export const deleteTaskDocument = createAsyncThunk(
   'tasks/deleteDocument',
   async ({ taskId, docId }, { rejectWithValue }) => {
     try {
       await api.delete(`/tasks/${taskId}/documents/${docId}`);
-      return { taskId, docId };
+      return { taskId, docId }; // Return IDs for state updates
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
